@@ -1,0 +1,21 @@
+# Use `just work day01 part1` to work on the specific binary for a specific day's problems
+work day part:
+  bacon check -- -p day{{day}}
+ed day part:
+  neovide "day{{day}}/src/part{{part}}.rs"
+bench-all:
+  cargo bench -q > benchmarks.txt
+bench day part:
+  cargo bench --bench day{{day}}-bench part{{part}} >> day{{day}}.bench.txt
+run day part:
+  cargo run -q -p day{{day}} --bin part{{part}} --release
+lint day:
+  cargo clippy -p day{{day}}
+dbg day part:
+  cargo nextest run -p day{{day}} --lib part{{part}} --nocapture
+testday day:
+  cargo nextest run -p day{{day}}
+test day part:
+  cargo nextest run -p day{{day}} part{{part}}
+create day:
+  cargo generate --path ./daily-template --name day{{day}}
