@@ -43,7 +43,8 @@ pub fn process(input: &str) -> miette::Result<String> {
         }
 
         n if (n.checked_ilog10().unwrap_or(0) + 1) % 2 == 0 => {
-          let divisor = 10u64.pow((&n.ilog10() + 1) / 2);
+          let digit_len = &n.ilog10() + 1;
+          let divisor = 10u64.pow(digit_len / 2);
           let (left, right) = Euclid::div_rem_euclid(&n, &divisor);
           new_counter
             .entry(left)
