@@ -1,0 +1,23 @@
+[package]
+name = "day11"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+itertools.workspace = true
+nom.workspace = true
+miette.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+num = "0.4.3"
+either = "1.13"
+
+[dev-dependencies]
+divan.workspace = true
+rstest.workspace = true
+test-log.workspace = true
+
+[[bench]]
+name = "day11-bench"
+path = "benches/benchmarks.rs"
+harness = false
