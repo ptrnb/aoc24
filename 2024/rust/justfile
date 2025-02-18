@@ -1,5 +1,5 @@
 # Use `just work day01 part1` to work on the specific binary for a specific day's problems
-work day part:
+watch day:
   bacon check -- -p day{{day}}
 ed day part:
   neovide "day{{day}}/src/part{{part}}.rs"
