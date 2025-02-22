@@ -6,7 +6,7 @@ use nom::{
   IResult, Parser,
 };
 
-use crate::types::{Button, ClawMachine};
+use crate::types::{Button, ClawMachine, Prize};
 
 fn a_button(input: &str) -> IResult<&str, Button> {
   preceded(
@@ -22,10 +22,10 @@ fn b_button(input: &str) -> IResult<&str, Button> {
   )(input)
 }
 
-fn prize(input: &str) -> IResult<&str, Button> {
+fn prize(input: &str) -> IResult<&str, Prize> {
   preceded(
     tag("Prize: X="),
-    separated_pair(complete::i64, tag(", Y="), complete::i64).map(|(x, y)| Button::new(x, y)),
+    separated_pair(complete::i64, tag(", Y="), complete::i64).map(|(x, y)| Prize::new(x, y)),
   )(input)
 }
 
