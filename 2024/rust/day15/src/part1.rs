@@ -8,11 +8,11 @@ pub fn process(input: &str) -> miette::Result<String> {
   let (mut warehouse, moves) = parse(input);
   for robot_move in moves {
     let new_position = warehouse.robot + robot_move;
-    if warehouse.can_move(&new_position, &robot_move) {
+    if warehouse.try_move(&new_position, &robot_move) {
       warehouse.robot = new_position;
     }
   }
-  Ok(warehouse.score().to_string())
+  Ok(warehouse.box_score().to_string())
 }
 
 fn parse(input: &str) -> (Warehouse, Moves) {
@@ -114,13 +114,13 @@ impl Display for Warehouse {
 }
 
 impl Warehouse {
-  fn can_move(&mut self, pos: &I64Vec2, direction: &I64Vec2) -> bool {
+  fn try_move(&mut self, pos: &I64Vec2, direction: &I64Vec2) -> bool {
     match self.floorplan.get(pos) {
       None => true,
       Some(Item::Wall) => false,
       Some(Item::Box) => {
         let next_position = pos + direction;
-        if self.can_move(&next_position, direction) {
+        if self.try_move(&next_position, direction) {
           self.floorplan.remove(pos);
           self.floorplan.insert(next_position, Item::Box);
           true
@@ -131,7 +131,7 @@ impl Warehouse {
     }
   }
 
-  fn score(&self) -> i64 {
+  fn box_score(&self) -> i64 {
     self
       .floorplan
       .iter()
