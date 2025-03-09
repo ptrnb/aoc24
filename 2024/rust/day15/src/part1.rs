@@ -4,17 +4,17 @@ use crate::types::{Moves, Warehouse};
 
 #[tracing::instrument]
 pub fn process(input: &str) -> miette::Result<String> {
-  let (mut warehouse, moves) = parse(input);
-  for robot_move in moves {
-    let new_position = warehouse.robot + robot_move;
-    if warehouse.try_move(&new_position, &robot_move) {
+  let (moves, mut warehouse) = parse(input);
+  for robot_direction in moves {
+    let new_position = warehouse.robot + robot_direction;
+    if warehouse.try_move(&new_position, &robot_direction) {
       warehouse.robot = new_position;
     }
   }
   Ok(warehouse.box_score().to_string())
 }
 
-fn parse(input: &str) -> (Warehouse, Moves) {
+fn parse(input: &str) -> (Moves, Warehouse) {
   let (warehouse, moves) = input.split_once("\n\n").unwrap_or_default();
   let warehouse = Warehouse::from(warehouse);
   let moves: Moves = moves
@@ -32,7 +32,7 @@ fn parse(input: &str) -> (Warehouse, Moves) {
         .collect::<Moves>()
     })
     .collect();
-  (warehouse, moves)
+  (moves, warehouse)
 }
 
 #[cfg(test)]
@@ -41,17 +41,28 @@ mod tests {
 
   #[test]
   fn test_process() -> miette::Result<()> {
-    let input = "########
-#..O.O.#
-##@.O..#
-#...O..#
-#.#.O..#
-#...O..#
-#......#
-########
+    let input = "##########
+#..O..O.O#
+#......O.#
+#.OO..O.O#
+#..O@..O.#
+#O#..O...#
+#O..O..O.#
+#.OO.O.OO#
+#....O...#
+##########
 
-<^^>>>vv<v>>v<<";
-    assert_eq!("2028", process(input)?);
+<vv>^<v^>v>^vv^v>v<>v^v<v<^vv<<<^><<><>>v<vvv<>^v^>^<<<><<v<<<v^vv^v>^
+vvv<<^>^v^^><<>>><>^<<><^vv^^<>vvv<>><^^v>^>vv<>v<<<<v<^v>^<^^>>>^<v<v
+><>vv>v^v^<>><>>>><^^>vv>v<^^^>>v^v^<^^>v^^>v^<^v>v<>>v^v^<v>v^^<^^vv<
+<<v<^>>^^^^>>>v^<>vvv^><v<<<>^^^vv^<vvv>^>v<^^^^v<>^>vvvv><>>v^<<^^^^^
+^><^><>>><>^^<<^^v>>><^<v>^<vv>>v>>>^v><>^v><<<<v>>v<v<v>vvv>^<><<>^><
+^>><>^v<><^vvv<^^<><v<<<<<><^v<<<><<<^^<v<^^^><^>>^<v^><<<^>>^v<v^v<v^
+>^>>^v>vv>^<<^v<>><<><<v<<v><>v<^vv<<<>^^v^>^^>>><<^v>>v^v><^^>>^<>vv^
+<><^^>^^^<><vvvvv^v<v<<>^v<v>v<<^><<><<><<<^^<<<^<<>><<><^^^>^^<>^>v<>
+^^>vv<^v^v<vv>^<><v<^v>^^^>>>^^vvv^>vvv<>>>^<^>>>>>^<<^v>^vvv<>^<><<v>
+v^^>>><<^^<>>^v^<v^vv<>v^<<>^<^v^v><^<<<><<^<v><v<>vv>>v><v^<vv<>v^<<^";
+    assert_eq!("10092", process(input)?);
     Ok(())
   }
 }
