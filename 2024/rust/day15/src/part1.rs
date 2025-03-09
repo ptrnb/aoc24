@@ -11,6 +11,7 @@ pub fn process(input: &str) -> miette::Result<String> {
       warehouse.robot = new_position;
     }
   }
+  // println!("{}", &warehouse);
   Ok(warehouse.box_score().to_string())
 }
 

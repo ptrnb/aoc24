@@ -69,7 +69,8 @@ impl Display for Warehouse {
       for col in 0..=self.width {
         let pos = I64Vec2::new(row, col);
         if pos == self.robot {
-          write!(f, "@")?
+          write!(f, "@")?;
+          continue;
         };
         match self.floorplan.get(&pos) {
           None => write!(f, ".")?,
