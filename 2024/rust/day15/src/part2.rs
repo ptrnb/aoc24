@@ -1,6 +1,36 @@
+use crate::types::{Moves, WideWarehouse};
+
 #[tracing::instrument]
 pub fn process(input: &str) -> miette::Result<String> {
-  Ok("9021".to_string())
+  let (moves, mut wide_warehouse) = parse(input);
+  for robot_direction in moves {
+    let new_position = wide_warehouse.robot + robot_direction;
+    if wide_warehouse.try_big_move(new_position, robot_direction) {
+      wide_warehouse.robot = new_position;
+    }
+  }
+  Ok(wide_warehouse.box_score().to_string())
+}
+
+fn parse(input: &str) -> (Moves, WideWarehouse) {
+  let (wide_warehouse, moves) = input.split_once("\n\n").unwrap_or_default();
+  let wide_warehouse = WideWarehouse::from(wide_warehouse);
+  let moves: Moves = moves
+    .lines()
+    .flat_map(|line| {
+      line
+        .chars()
+        .map(|ch| match ch {
+          '>' => WideWarehouse::RIGHT,
+          'v' => WideWarehouse::DOWN,
+          '<' => WideWarehouse::LEFT,
+          '^' => WideWarehouse::UP,
+          _ => unreachable!(),
+        })
+        .collect::<Moves>()
+    })
+    .collect();
+  (moves, wide_warehouse)
 }
 
 #[cfg(test)]

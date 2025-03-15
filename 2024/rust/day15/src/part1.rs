@@ -1,5 +1,3 @@
-use glam::I64Vec2;
-
 use crate::types::{Moves, Warehouse};
 
 #[tracing::instrument]
@@ -24,10 +22,10 @@ fn parse(input: &str) -> (Moves, Warehouse) {
       line
         .chars()
         .map(|ch| match ch {
-          '>' => I64Vec2::Y, // Y is col
-          'v' => I64Vec2::X, // X is row
-          '<' => I64Vec2::NEG_Y,
-          '^' => I64Vec2::NEG_X,
+          '>' => Warehouse::RIGHT,
+          'v' => Warehouse::DOWN,
+          '<' => Warehouse::LEFT,
+          '^' => Warehouse::UP,
           _ => unreachable!(),
         })
         .collect::<Moves>()
