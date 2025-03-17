@@ -25,7 +25,7 @@ struct MazeTracker {
 
 #[derive(Debug, Eq, PartialEq)]
 struct Maze {
-  walls: HashSet<I64Vec2>,
+  path: HashSet<I64Vec2>,
   rows: i64,
   cols: i64,
   start: I64Vec2,
@@ -34,7 +34,7 @@ struct Maze {
 
 impl From<&str> for Maze {
   fn from(input: &str) -> Self {
-    let mut walls = HashSet::new();
+    let mut path = HashSet::new();
     let mut start = I64Vec2::ZERO;
     let mut end = I64Vec2::ZERO;
     let mut rows: i64 = 0;
@@ -50,13 +50,14 @@ impl From<&str> for Maze {
           start = location;
         } else if 'E' == ch {
           end = location;
-        } else if '#' == ch {
-          walls.insert(location);
+          path.insert(location);
+        } else if '.' == ch {
+          path.insert(location);
         }
       }
     }
     Self {
-      walls,
+      path,
       start,
       end,
       rows,
@@ -70,14 +71,14 @@ impl Display for Maze {
     for row in 0..=self.rows {
       for col in 0..=self.cols {
         let pos = I64Vec2::new(row, col);
-        if self.walls.contains(&pos) {
-          write!(f, "#")?;
+        if self.path.contains(&pos) {
+          write!(f, ".")?;
         } else if pos == self.start {
           write!(f, "S")?;
         } else if pos == self.end {
           write!(f, "E")?;
         } else {
-          write!(f, ".")?;
+          write!(f, "#")?;
         }
       }
       writeln!(f)?;
@@ -98,24 +99,26 @@ impl Maze {
       // Starting location
       start_location,
       // Function to find successor nodes and tally cost
-      |current| {
+      |step| {
         // Must return type with IntoIter
-        let mut result = Vec::<(MazeTracker, usize)>::new();
-        let next_step = current.location + current.direction;
-        if !self.walls.contains(&next_step) {
-          result.push((
+        let mut possible_steps = Vec::<(MazeTracker, usize)>::new();
+
+        let next_step = step.location + step.direction;
+        if self.path.contains(&next_step) {
+          possible_steps.push((
             MazeTracker {
               location: next_step,
-              direction: current.direction,
+              direction: step.direction,
             },
             // Score is 1 point for the move
             1,
           ));
         }
-        let left_turn = I64Vec2::new(-current.direction.y, current.direction.x);
-        let next_step = current.location + left_turn;
-        if !self.walls.contains(&next_step) {
-          result.push((
+
+        let left_turn = I64Vec2::new(-step.direction.y, step.direction.x);
+        let next_step = step.location + left_turn;
+        if self.path.contains(&next_step) {
+          possible_steps.push((
             MazeTracker {
               location: next_step,
               direction: left_turn,
@@ -124,10 +127,11 @@ impl Maze {
             1001,
           ));
         }
-        let right_turn = I64Vec2::new(current.direction.y, -current.direction.x);
-        let next_step = current.location + right_turn;
-        if !self.walls.contains(&next_step) {
-          result.push((
+
+        let right_turn = I64Vec2::new(step.direction.y, -step.direction.x);
+        let next_step = step.location + right_turn;
+        if self.path.contains(&next_step) {
+          possible_steps.push((
             MazeTracker {
               location: next_step,
               direction: right_turn,
@@ -136,7 +140,8 @@ impl Maze {
             1001,
           ));
         }
-        result
+
+        possible_steps
       },
       // Final test to see if we have reached the destination
       |step| step.location == self.end,
