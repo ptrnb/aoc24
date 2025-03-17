@@ -17,6 +17,12 @@ pub fn process(input: &str) -> miette::Result<String> {
   Ok(cost.to_string())
 }
 
+#[derive(Debug, Default, Eq, PartialEq, Clone, Copy, Hash)]
+struct MazeTracker {
+  location: I64Vec2,
+  direction: I64Vec2,
+}
+
 #[derive(Debug, Eq, PartialEq)]
 struct Maze {
   walls: HashSet<I64Vec2>,
@@ -39,6 +45,7 @@ impl From<&str> for Maze {
         cols = if col as i64 > cols { col as i64 } else { cols };
 
         let location = I64Vec2::new(row as i64, col as i64);
+
         if 'S' == ch {
           start = location;
         } else if 'E' == ch {
@@ -77,12 +84,6 @@ impl Display for Maze {
     }
     Ok(())
   }
-}
-
-#[derive(Debug, Default, Eq, PartialEq, Clone, Copy, Hash)]
-struct MazeTracker {
-  location: I64Vec2,
-  direction: I64Vec2,
 }
 
 impl Maze {
@@ -138,7 +139,7 @@ impl Maze {
         result
       },
       // Final test to see if we have reached the destination
-      |state| state.location == self.end,
+      |step| step.location == self.end,
     )
   }
 }
